@@ -30,7 +30,11 @@ final class ViewController: UIViewController {
     @objc func keyboardWillHide(notification: Notification) {
         myScrollView.contentInset = UIEdgeInsets.zero
         myScrollView.scrollIndicatorInsets = UIEdgeInsets.zero
-        
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        print(#function)
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -43,16 +47,48 @@ final class ViewController: UIViewController {
     @objc func hideKeyboard() {
         myScrollView.endEditing(true)
     }
-
-    @IBAction func login(_ sender: UIButton) {
-        guard let loginText = loginTextField.text else { return }
-        guard let passwordText = passwordTextField.text else { return }
+    
+    private func checkLoginInfo() -> Bool {
+        guard let loginText = loginTextField.text else { return false }
+        guard let passwordText = passwordTextField.text else { return false }
         
         if loginText == "admin", passwordText == "12345" {
             print("Успешно!")
+            return true
         } else {
             print("Попробуй еще раз!")
+            return false
         }
+    }
+    
+    override func shouldPerformSegue(withIdentifier identifire: String, sender: Any?) -> Bool {
+        if identifire == "loginSegue" {
+            if checkLoginInfo() {
+                return true
+            } else {
+                showLoginError()
+                return false
+            }
+        }
+        return true
+    }
+    
+    private func showLoginError() {
+        let alert = UIAlertController(title: "Ошибка!", message: "Логин и/или пароль не верны", preferredStyle: .alert)
+        
+        let action = UIAlertAction(title: "OK", style: .cancel, handler: nil)
+        alert.addAction(action)
+        present(alert, animated: true)
+    }
+    
+    @IBAction func loginTapped(_ sender: UIButton) {
+        guard let vc = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "helloVC") as? HelloWorldViewController else { return }
+        navigationController?.pushViewController(vc, animated: true)
+        
+    }
+
+    @IBAction func login(_ sender: UIButton) {
+        
     }
     
     
